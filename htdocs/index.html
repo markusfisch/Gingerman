@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+<title>(ld31)</title>
+<style>
+
+html,
+body
+{
+	margin: 0; padding: 0;
+	overflow: hidden;
+}
+
+</style>
+</head>
+<body>
+<script>
+
+"use strict";
+
+var requestAnimFrame =
+		window.requestAnimationFrame ||
+		window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame ||
+		window.msRequestAnimationFrame ||
+		window.oRequestAnimationFrame ||
+		function( callback )
+		{
+			window.setTimeout( callback, 16 );
+		},
+	canvas,
+	ctx,
+	ratio,
+	width,
+	height,
+	now,
+	factor,
+	last;
+
+function draw()
+{
+	ctx.clearRect( 0, 0, width, height );
+
+	var t = now*.5 | 0;
+	ctx.fillStyle = "white";
+	ctx.fillRect( t % width, t % height, 100, 100 );
+}
+
+function run()
+{
+	now = new Date().getTime();
+	factor = (now-last)/16;
+	last = now;
+
+	draw();
+
+	requestAnimFrame( run );
+}
+
+function resize()
+{
+	var w = window.innerWidth,
+		h = window.innerHeight;
+
+	width = w*ratio | 0;
+	height = h*ratio | 0;
+
+	canvas.width = width;
+	canvas.height = height;
+	canvas.style.width = w+"px";
+	canvas.style.height = h+"px";
+}
+
+function createCanvas()
+{
+	if( !(canvas = document.createElement( "canvas" )) ||
+		!(ctx = canvas.getContext( "2d", { alpha: false } )) )
+		return false;
+
+	ratio =
+		(window.devicePixelRatio || 1)/
+		(ctx.webkitBackingStorePixelRatio ||
+			ctx.mozBackingStorePixelRatio ||
+			ctx.msBackingStorePixelRatio ||
+			ctx.oBackingStorePixelRatio ||
+			ctx.backingStorePixelRatio ||
+			1);
+
+	return true;
+}
+
+function init()
+{
+	if( !createCanvas() )
+		return;
+
+	resize();
+	window.onresize = resize;
+
+	document.body.appendChild( canvas );
+
+	last = new Date().getTime()-16;
+	run();
+}
+
+window.onload = init;
+
+</script>
+</body>
+</html>
