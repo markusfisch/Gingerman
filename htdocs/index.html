@@ -269,30 +269,6 @@ var requestAnimFrame =
 	treeHeight,
 	seed;
 
-function _addObjects( type, gap, f, offset )
-{
-	gap = gap | 0;
-
-	var from = bottomY-gap,
-		to = (bottomY-treeHeight)+gap,
-		wf = (treeHeight*.25)/(from-to);
-
-	for( var y = from, n = offset || 0;
-		y > to;
-		y -= gap, ++n )
-	{
-		var x = (centerX+Math.sin( f*n )*((y-to)*wf)) | 0;
-
-		objects[objectsLength++] = {
-			type: type,
-			x: x,
-			y: y | 0 };
-console.log( "type: "+type+" #"+objectsLength+" "+
-	((x-centerX)/scaleFactor)+"/"+
-	((y-bottomY)/scaleFactor) );
-	}
-}
-
 function addObjects( type, coordinates )
 {
 	for( var n = coordinates.length; n--; )
@@ -992,7 +968,6 @@ function resize()
 
 	scaleFactor = Math.max(
 		1,
-		//Math.round( height/(resources.gingerman.rect.h*10) ) );
 		height/(resources.gingerman.rect.h*10) | 0 );
 
 	bg.width = fg.width = width;
@@ -1003,9 +978,7 @@ function resize()
 	centerX = width >> 1;
 	centerY = height >> 1;
 	jumpTriggerY = height-(height/3 | 0);
-	//gravity = height*.0003;//scaleFactor*.05;
 	gravity = scaleFactor*.05;
-	//jumpPower = height*.01;//scaleFactor*1.8*(height/scaleFactor/160);
 	jumpPower = scaleFactor*1.8;
 	cheerPower = Math.max( 1, scaleFactor*.5 );
 	terminalVelocity = jumpPower*1.5;
