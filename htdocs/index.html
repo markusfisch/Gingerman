@@ -939,7 +939,11 @@ function scaleSprite( res, rect, w, h )
 				continue;
 
 			x.fillStyle = 'rgba('+r+','+g+','+b+','+(a/255)+')';
-			x.fillRect( sx, sy, scaleFactor, scaleFactor );
+			x.fillRect(
+				Math.ceil( sx ),
+				Math.ceil( sy ),
+				Math.ceil( scaleFactor ),
+				Math.ceil( scaleFactor ) );
 		}
 
 	return c;
@@ -968,7 +972,7 @@ function resize()
 
 	scaleFactor = Math.max(
 		1,
-		height/(resources.gingerman.rect.h*10) | 0 );
+		height/(resources.gingerman.rect.h*10) );
 
 	bg.width = fg.width = width;
 	bg.height = fg.height = height;
