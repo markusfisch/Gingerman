@@ -117,7 +117,7 @@ var requestAnimFrame =
 	levels = [
 		function()
 		{
-			treeHeight = scaleFactor*16*9;
+			treeHeight = height*.85;
 
 			addObjects(
 				typeFire,
@@ -140,7 +140,7 @@ var requestAnimFrame =
 		},
 		function()
 		{
-			treeHeight = scaleFactor*16*6;
+			treeHeight = height*.55;
 
 			addObjects(
 				typeFire,
@@ -160,7 +160,7 @@ var requestAnimFrame =
 		},
 		function()
 		{
-			treeHeight = scaleFactor*16*8;
+			treeHeight = height*.75;
 
 			addObjects(
 				typeFire,
@@ -185,7 +185,7 @@ var requestAnimFrame =
 		},
 		function()
 		{
-			treeHeight = scaleFactor*16*7;
+			treeHeight = height*.65;
 
 			addObjects(
 				typeFire,
@@ -208,7 +208,7 @@ var requestAnimFrame =
 		},
 		function()
 		{
-			treeHeight = scaleFactor*16*8;
+			treeHeight = height*.75;
 
 			addObjects(
 				typeFire,
@@ -281,8 +281,6 @@ var requestAnimFrame =
 	jumpPower,
 	cheerPower,
 	terminalVelocity,
-	maxJumpWidth,
-	maxJumpHeight,
 	fragmentsLength,
 	fragments = [],
 	typeBall = 0,
@@ -296,6 +294,11 @@ var requestAnimFrame =
 	treeHeight,
 	seed;
 
+function align( n )
+{
+	return (n/scaleFactor | 0)*scaleFactor | 0;
+}
+
 function addObjects( type, coordinates )
 {
 	for( var n = coordinates.length; n--; )
@@ -304,8 +307,8 @@ function addObjects( type, coordinates )
 
 		objects[objectsLength++] = {
 			type: type,
-			x: (centerX+c.x*scaleFactor) | 0,
-			y: (bottomY-c.y*scaleFactor) | 0 };
+			x: align( centerX+c.x*scaleFactor ),
+			y: align( bottomY-c.y*scaleFactor ) };
 	}
 }
 
@@ -659,14 +662,14 @@ function drawTree()
 	var sprite = sprites.branchLeft8;
 	ctxBg.drawImage(
 		sprite,
-		(centerX-scaleFactor*12) | 0,
-		(b-treeHeight+scaleFactor*8) | 0 );
+		align( centerX-scaleFactor*12 ),
+		align( b-treeHeight+scaleFactor*8 ) );
 
 	var sprite = sprites.trunk;
 	ctxBg.drawImage(
 		sprite,
-		(centerX-sprite.centerX) | 0,
-		(bottomY-sprite.height) | 0 );
+		align( centerX-sprite.centerX ),
+		align( bottomY-sprite.height ) );
 
 	for( var y = b; y > t; y -= bh )
 	{
@@ -681,8 +684,8 @@ function drawTree()
 
 			ctxBg.drawImage(
 				sprite,
-				(xx-sprite.centerX) | 0,
-				(y-sprite.height) | 0 );
+				align( xx-sprite.centerX ),
+				align( y-sprite.height ) );
 		}
 
 		var branch = branches[Math.max( 0, idx-(random()*2 | 0) )],
@@ -690,8 +693,8 @@ function drawTree()
 
 		ctxBg.drawImage(
 			sprite,
-			(x-sprite.width) | 0,
-			(y-sprite.height) | 0 );
+			align( x-sprite.width ),
+			align( y-sprite.height ) );
 
 		--idx;
 
@@ -700,8 +703,8 @@ function drawTree()
 
 		ctxBg.drawImage(
 			sprite,
-			x,
-			(y-sprite.height) | 0 );
+			align( x ),
+			align( y-sprite.height ) );
 	}
 }
 
@@ -719,7 +722,7 @@ function drawBg()
 	drawStaticObjects();
 }
 
-function validateObjects()
+function resetObjects()
 {
 	var rb = sprites.ball.width*.5 | 0,
 		rf = sprites.fire0.width*.5 | 0,
@@ -757,13 +760,12 @@ function reset()
 
 	gameBeat = gameOver = false;
 	playerAlive = true;
-	playerWon = false;
-	playerBurned = false;
+	playerWon = playerBurned = false;
 
 	playerX = centerX >> 1;
 	bottomY = playerY = height-sprites.gingerman.centerY;
 	playerVx = 0;
-	playerVy = -jumpPower >> 1;
+	playerVy = -jumpPower/2;
 
 	seed = Math.PI;
 	objectsLength = 0;
@@ -772,10 +774,10 @@ function reset()
 
 	objects[objectsLength++] = {
 		type: typeStar,
-		x: centerX,
-		y: bottomY-treeHeight };
+		x: align( centerX ),
+		y: align( bottomY-treeHeight ) };
 
-	validateObjects();
+	resetObjects();
 	drawBg();
 }
 
@@ -1022,11 +1024,6 @@ function resize()
 	jumpPower = scaleFactor*1.8;
 	cheerPower = Math.max( 1, scaleFactor*.5 );
 	terminalVelocity = jumpPower*1.5;
-
-	var steps = jumpPower/gravity;
-	maxJumpWidth = steps*scaleFactor*2;
-	maxJumpHeight = steps*jumpPower*.52;
-
 	offsetCandle = scaleFactor*4;
 
 	scale();
@@ -1106,7 +1103,7 @@ function createFragments()
 		}
 }
 
-function decompressAtlas()
+function unpackAtlas()
 {
 	var c = document.createElement( "canvas" ),
 		x = c.getContext( "2d" ),
@@ -1133,7 +1130,7 @@ function init()
 		return;
 	}
 
-	decompressAtlas();
+	unpackAtlas();
 	createFragments();
 	indexBranches();
 
