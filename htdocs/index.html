@@ -321,6 +321,7 @@ var requestAnimFrame =
 	objectOn,
 	burnFrequency = 64,
 	offsetCandle,
+	offsetShadow,
 	maxTreeHeight,
 	treeHeight,
 	seed;
@@ -433,21 +434,6 @@ function drawSprite( sprite, x, y )
 		(y-sprite.centerY) | 0 );
 }
 
-function setSparkles()
-{
-	for( var n = sparklesLength; n--; )
-	{
-		var s = sparkles[n],
-			alpha = Math.random()*6.28,
-			speed = Math.random()*4;
-
-		s.ox = s.x = playerX;
-		s.oy = s.y = playerY;
-		s.ovx = s.vx = Math.cos( alpha )*scaleFactor*speed;
-		s.ovy = s.vy = Math.sin( alpha )*scaleFactor*speed;
-	}
-}
-
 function endGame()
 {
 	if( endGameTimer )
@@ -507,7 +493,6 @@ function levelUp()
 		return;
 
 	playerWon = true;
-	setSparkles();
 
 	if( ++level >= levels.length )
 	{
@@ -572,7 +557,7 @@ function fly()
 function drawPlayer()
 {
 	var state,
-		shadowY = bottomY+sprites.gingerman.centerY;
+		shadowY = bottomY+offsetShadow;
 
 	if( playerBurned )
 	{
@@ -622,13 +607,13 @@ function drawPlayer()
 		else
 			state = "gingerman";
 
-		shadowY = playerY+sprites.gingerman.centerY;
+		shadowY = playerY+offsetShadow;
 	}
 
 	if( playerWon )
 	{
 		jump( cheerPower );
-		shadowY = playerY+sprites.gingerman.centerY;
+		shadowY = playerY+offsetShadow;
 	}
 
 	drawSprite(
@@ -819,33 +804,37 @@ function drawTree()
 	drawTrunk();
 
 	var b = bottomY,
-		t = b-(treeHeight-(sprites.star.centerY*1.7 | 0)),
+		t = b-treeHeight+sprites.star.centerY,
 		h = b-t,
-		bh = h/10,
+		steps = 10,
+		step = h/steps,
 		idx = branchesLength-1,
-		x = centerX,
-		rw = scaleFactor*16,
-		rf = (treeHeight*.5)/h,
-		bf = 6/h;
+		idxFactor = branchesLength/steps,
+		innerStep = scaleFactor*14,
+		innerFactor = (treeHeight*.5)/h,
+		branchFactor = 6/h,
+		x = centerX;
 
-	for( var y = b; y > t; y -= bh )
+	for( var y = b; steps--; y -= step )
 	{
-		for( var r = (y-t)*rf, xx = x-r/2, xe = xx+r;
-			xx < xe;
-			xx += rw )
+		var p = y-t;
+
+		for( var w = p*innerFactor, ix = x-w/2, innerMax = ix+w;
+			ix < innerMax;
+			ix += innerStep )
 		{
-			var branch = branches[(random()*(y-t)*bf) | 0],
-				sprite = sprites[(xx > x ?
+			var branch = branches[(random()*p*branchFactor) | 0],
+				sprite = sprites[(ix > x ?
 					"branchRight" :
 					"branchLeft")+branch];
 
 			ctxBg.drawImage(
 				sprite,
-				align( xx-sprite.centerX ),
+				align( ix-sprite.centerX ),
 				align( y-sprite.height ) );
 		}
 
-		var branch = branches[Math.max( 0, idx-(random()*2 | 0) )],
+		var branch = branches[Math.max( 0, idx-(random()*3 | 0) ) | 0],
 			sprite = sprites["branchLeft"+branch];
 
 		ctxBg.drawImage(
@@ -853,15 +842,15 @@ function drawTree()
 			align( x-sprite.width ),
 			align( y-sprite.height ) );
 
-		--idx;
-
-		var branch = branches[Math.max( 0, idx-(random()*2 | 0) )],
+		var branch = branches[Math.max( 0, idx-(random()*3 | 0) ) | 0],
 			sprite = sprites["branchRight"+branch];
 
 		ctxBg.drawImage(
 			sprite,
 			align( x ),
 			align( y-sprite.height ) );
+
+		idx -= idxFactor;
 	}
 }
 
@@ -876,7 +865,9 @@ function drawRoom()
 		for( var x = 0; x < width; x += w )
 			ctxBg.drawImage( wall, x, y );
 
-	for( var x = 0, y = height-floor.height; x < width; x += w )
+	for( var x = 0, y = height-floor.height;
+		x < width;
+		x += w )
 		ctxBg.drawImage( floor, x, y );
 }
 
@@ -933,6 +924,21 @@ function resetObjects()
 	}
 }
 
+function setSparkles( x, y )
+{
+	for( var n = sparklesLength; n--; )
+	{
+		var s = sparkles[n],
+			alpha = Math.random()*6.28,
+			speed = Math.random()*4;
+
+		s.ox = s.x = x;
+		s.oy = s.y = y;
+		s.ovx = s.vx = Math.cos( alpha )*scaleFactor*speed;
+		s.ovy = s.vy = Math.sin( alpha )*scaleFactor*speed;
+	}
+}
+
 function reset()
 {
 	if( autoRestartTimer )
@@ -952,10 +958,18 @@ function reset()
 
 	levels[level]();
 
-	objects[objectsLength++] = {
-		type: typeStar,
-		x: align( centerX ),
-		y: align( bottomY-treeHeight ) };
+	// add star
+	{
+		var starX = align( centerX ),
+			starY = align( bottomY-treeHeight );
+
+		objects[objectsLength++] = {
+			type: typeStar,
+			x: starX,
+			y: starY };
+
+		setSparkles( starX, starY );
+	}
 
 	resetObjects();
 	drawBackground();
@@ -1193,6 +1207,8 @@ function resize()
 		1,
 		height/(resources.gingerman.rect.h*11) );
 
+	scale();
+
 	bg.width = fg.width = width;
 	bg.height = fg.height = height;
 	bg.style.width = fg.style.width = w+"px";
@@ -1207,8 +1223,8 @@ function resize()
 	cheerPower = Math.max( 1, scaleFactor*.5 );
 	terminalVelocity = jumpPower*1.5;
 	offsetCandle = scaleFactor*4;
+	offsetShadow = sprites.gingerman.centerY;
 
-	scale();
 	reset();
 
 	resizing = false;
