@@ -64,9 +64,9 @@ var requestAnimFrame =
 		ballRed: { rect: {/*ball-red*/x:189,y:16,w:11,h:15} },
 		candyCane: { rect: {/*candy-cane*/x:197,y:95,w:6,h:16} },
 		picture: { rect: {/*picture*/x:144,y:29,w:31,h:28} },
-		gift0: { rect: {/*gift0*/x:144,y:81,w:18,h:14} },
-		gift1: { rect: {/*gift1*/x:162,y:81,w:16,h:12} },
-		gift2: { rect: {/*gift2*/x:191,y:59,w:12,h:14} },
+		giftRed: { rect: {/*gift-red*/x:144,y:81,w:18,h:14} },
+		giftGreen: { rect: {/*gift-green*/x:162,y:81,w:16,h:12} },
+		giftBlue: { rect: {/*gift-blue*/x:191,y:59,w:12,h:14} },
 		outlet: { rect: {/*outlet*/x:189,y:46,w:7,h:8} },
 		candle: { rect: {/*candle*/x:192,y:123,w:7,h:14} },
 		fire0: { rect: {/*fire0*/x:136,y:163,w:13,h:16} },
@@ -137,7 +137,7 @@ var requestAnimFrame =
 			treeHeight = maxTreeHeight*.85;
 
 			addObjects(
-				typeFire,
+				{type:typeFire},
 				[
 					{x:-5,y:47},
 					{x:-28,y:37},
@@ -145,7 +145,7 @@ var requestAnimFrame =
 				] );
 
 			addObjects(
-				typeBall,
+				{type:typeBall,sprite:"ballBlue"},
 				[
 					{x:0,y:20},
 					{x:28,y:40},
@@ -155,10 +155,29 @@ var requestAnimFrame =
 				] );
 
 			addObjects(
-				typeCandyCane,
+				{type:typeCandyCane},
 				[
-					{x:20,y:20},
+					{x:18,y:26},
 					{x:-16,y:50},
+				] );
+
+			addObjects(
+				{type:typePicture},
+				[
+					{x:-60,y:100},
+				] );
+
+			addObjects(
+				{type:typeOutlet},
+				[
+					{x:70,y:20},
+				] );
+
+			addObjects(
+				{type:typeGift},
+				[
+					{x:24,y:10,sprite:"giftRed"},
+					{x:46,y:12,sprite:"giftBlue"},
 				] );
 		},
 		function()
@@ -166,7 +185,7 @@ var requestAnimFrame =
 			treeHeight = maxTreeHeight*.55;
 
 			addObjects(
-				typeFire,
+				{type:typeFire},
 				[
 					{x:-7,y:23},
 					{x:25,y:47},
@@ -174,7 +193,7 @@ var requestAnimFrame =
 				] );
 
 			addObjects(
-				typeBall,
+				{type:typeBall},
 				[
 					{x:23,y:20},
 					{x:-14,y:40},
@@ -186,7 +205,7 @@ var requestAnimFrame =
 			treeHeight = maxTreeHeight*.75;
 
 			addObjects(
-				typeFire,
+				{type:typeFire},
 				[
 					{x:27,y:37},
 					{x:-32,y:30},
@@ -198,7 +217,7 @@ var requestAnimFrame =
 				] );
 
 			addObjects(
-				typeBall,
+				{type:typeBall},
 				[
 					{x:-10,y:26},
 					{x:17,y:53},
@@ -211,7 +230,7 @@ var requestAnimFrame =
 			treeHeight = maxTreeHeight*.65;
 
 			addObjects(
-				typeFire,
+				{type:typeFire},
 				[
 					{x:-20,y:35},
 					{x:5,y:43},
@@ -221,7 +240,7 @@ var requestAnimFrame =
 				] );
 
 			addObjects(
-				typeBall,
+				{type:typeBall},
 				[
 					{x:-38,y:26},
 					{x:28,y:40},
@@ -233,7 +252,7 @@ var requestAnimFrame =
 			treeHeight = maxTreeHeight*.75;
 
 			addObjects(
-				typeFire,
+				{type:typeFire},
 				[
 					{x:40,y:30},
 					{x:-30,y:40},
@@ -246,7 +265,7 @@ var requestAnimFrame =
 				] );
 
 			addObjects(
-				typeBall,
+				{type:typeBall},
 				[
 					{x:-14,y:22},
 					{x:30,y:25},
@@ -331,16 +350,46 @@ function align( n )
 	return (n/scaleFactor | 0)*scaleFactor | 0;
 }
 
-function addObjects( type, coordinates )
+function getSpriteFor( o )
 {
-	for( var n = coordinates.length; n--; )
+	switch( o.type )
 	{
-		var c = coordinates[n];
+		case typeBall:
+			return sprites[o.sprite ? o.sprite : "ballBlue"];
+		case typeCandyCane:
+			return sprites.candyCane;
+		case typeFire:
+			return sprites.candle;
+		case typeStar:
+			return sprites.star;
+		case typePicture:
+			return sprites.picture;
+		case typeGift:
+			return sprites[o.sprite ? o.sprite : "giftRed"];
+		case typeOutlet:
+			return sprites.outlet;
+	}
 
-		objects[objectsLength++] = {
-			type: type,
-			x: align( centerX+c.x*scaleFactor ),
-			y: align( bottomY-c.y*scaleFactor ) };
+	return null;
+}
+
+function addObjects( common, objs )
+{
+	for( var n = objs.length; n--; )
+	{
+		var o = objs[n];
+
+		for( var name in common )
+			if( typeof o[name] === "undefined" )
+				o[name] = common[name];
+
+		o.x = align( centerX+o.x*scaleFactor );
+		o.y = align( bottomY-o.y*scaleFactor );
+
+		var sprite = getSpriteFor( o );
+		o.radius = sprite.centerX*sprite.centerX;
+
+		objects[objectsLength++] = o;
 	}
 }
 
@@ -535,6 +584,7 @@ function fly()
 				case typeCandyCane:
 				case typePicture:
 				case typeGift:
+				case typeOutlet:
 					if( playerVy > 0 )
 						land( o );
 					break;
@@ -730,51 +780,29 @@ function walk( step )
 	}
 }
 
-function drawStaticObjects()
+function drawStaticForegroundObjects()
 {
 	for( var n = objectsLength; n--; )
 	{
-		var o = objects[n];
+		var o = objects[n],
+			sprite = getSpriteFor( o );
 
 		switch( o.type )
 		{
 			case typeBall:
-				var sprite = sprites.ballBlue;
-				ctxBg.drawImage(
-					sprite,
-					(o.x-sprite.centerX) | 0,
-					o.y );
-				break;
 			case typeCandyCane:
-				var sprite = sprites.candyCane;
-				ctxBg.drawImage(
-					sprite,
-					(o.x-sprite.centerX) | 0,
-					o.y );
-				break;
-			case typePicture:
-				var sprite = sprites.picture;
-				ctxBg.drawImage(
-					sprite,
-					(o.x-sprite.centerX) | 0,
-					o.y );
-				break;
-			case typeGift:
-				var sprite = sprites.gift0;
 				ctxBg.drawImage(
 					sprite,
 					(o.x-sprite.centerX) | 0,
 					o.y );
 				break;
 			case typeFire:
-				var sprite = sprites.candle;
 				ctxBg.drawImage(
 					sprite,
 					(o.x-sprite.centerX) | 0,
 					(o.y+offsetCandle) | 0 );
 				break;
 			case typeStar:
-				var sprite = sprites.star;
 				ctxBg.drawImage(
 					sprite,
 					align( o.x-sprite.centerX ),
@@ -788,6 +816,11 @@ function random()
 {
 	// from http://indiegamr.com/generate-repeatable-random-numbers-in-js/
 	return (seed = (seed*9301+49297) % 233280)/233280;
+}
+
+function nextBranch( idx )
+{
+	return branches[Math.max( 0, idx-(random()*3 | 0) ) | 0];
 }
 
 function drawTrunk()
@@ -835,23 +868,40 @@ function drawTree()
 				align( y-sprite.height ) );
 		}
 
-		var branch = branches[Math.max( 0, idx-(random()*3 | 0) ) | 0],
-			sprite = sprites["branchLeft"+branch];
-
+		var sprite = sprites["branchLeft"+nextBranch( idx )];
 		ctxBg.drawImage(
 			sprite,
 			align( x-sprite.width ),
 			align( y-sprite.height ) );
 
-		var branch = branches[Math.max( 0, idx-(random()*3 | 0) ) | 0],
-			sprite = sprites["branchRight"+branch];
-
+		var sprite = sprites["branchRight"+nextBranch( idx )];
 		ctxBg.drawImage(
 			sprite,
 			align( x ),
 			align( y-sprite.height ) );
 
 		idx -= idxFactor;
+	}
+}
+
+function drawStaticBackgroundObjects()
+{
+	for( var n = objectsLength; n--; )
+	{
+		var o = objects[n],
+			sprite = getSpriteFor( o );
+
+		switch( o.type )
+		{
+			case typePicture:
+			case typeGift:
+			case typeOutlet:
+				ctxBg.drawImage(
+					sprite,
+					(o.x-sprite.centerX) | 0,
+					o.y+offsetCandle );
+				break;
+		}
 	}
 }
 
@@ -875,51 +925,22 @@ function drawRoom()
 function drawBackground()
 {
 	drawRoom();
+	drawStaticBackgroundObjects();
 	drawTree();
-	drawStaticObjects();
+	drawStaticForegroundObjects();
 }
 
 function resetObjects()
 {
-	var radiusBall = sprites.ballOrange.width*.5 | 0,
-		radiusCandyCane = sprites.candyCane.width*.5 | 0,
-		radiusPicture = sprites.picture.width*.5 | 0,
-		radiusGift = sprites.gift0.width*.5 | 0,
-		radiusFire = sprites.fire0.width*.5 | 0,
-		radiusStar = sprites.star.width*.4 | 0;
-
-	radiusBall *= radiusBall;
-	radiusCandyCane *= radiusCandyCane;
-	radiusPicture *= radiusPicture;
-	radiusGift *= radiusGift;
-	radiusFire *= radiusFire;
-	radiusStar *= radiusStar;
-
 	for( var n = objectsLength; n--; )
 	{
 		var o = objects[n];
 
 		switch( o.type )
 		{
-			case typeBall:
-				o.radius = radiusBall;
-				break;
-			case typeCandyCane:
-				o.radius = radiusCandyCane;
-				break;
-			case typePicture:
-				o.radius = radiusPicture;
-				break;
-			case typeGift:
-				o.radius = radiusGift;
-				break;
 			case typeFire:
-				o.radius = radiusFire;
 				o.burnLast = 0,
 				o.burning = Math.random()*5 | 0;
-				break;
-			case typeStar:
-				o.radius = radiusStar;
 				break;
 		}
 	}
@@ -962,12 +983,14 @@ function reset()
 	// add star
 	{
 		var starX = align( centerX ),
-			starY = align( bottomY-treeHeight );
+			starY = align( bottomY-treeHeight ),
+			r = sprites.star.centerX;
 
 		objects[objectsLength++] = {
 			type: typeStar,
 			x: starX,
-			y: starY };
+			y: starY,
+			radius: r*r };
 
 		setSparkles( starX, starY );
 	}
