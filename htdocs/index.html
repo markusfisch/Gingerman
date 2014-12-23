@@ -256,7 +256,6 @@ var requestAnimFrame =
 				] );
 		},
 	],
-//level = levels.length-1,
 	atlas,
 	atlasWidth,
 	resizeTimer,
@@ -367,7 +366,7 @@ function drawHelp()
 
 	ctxFg.drawImage(
 		cursor,
-		20,
+		playerX-cursor.centerX,
 		y );
 }
 
@@ -815,12 +814,6 @@ function drawTree()
 		rw = scaleFactor*16,
 		rf = (treeHeight*.5)/h,
 		bf = 6/h;
-
-	var sprite = sprites.branchLeft8;
-	ctxBg.drawImage(
-		sprite,
-		align( centerX-scaleFactor*12 ),
-		align( b-treeHeight+scaleFactor*8 ) );
 
 	var sprite = sprites.trunk;
 	ctxBg.drawImage(
