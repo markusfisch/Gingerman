@@ -235,7 +235,7 @@ var requestAnimFrame =
 			addObjects(
 				typeFire,
 				[
-					{x:40,y:35},
+					{x:40,y:30},
 					{x:-30,y:40},
 					{x:10,y:45},
 					{x:-12,y:50},
@@ -493,6 +493,7 @@ function levelUp()
 		return;
 
 	playerWon = true;
+	playerVx = 0;
 
 	if( ++level >= levels.length )
 	{
@@ -796,7 +797,7 @@ function drawTrunk()
 	ctxBg.drawImage(
 		sprite,
 		align( centerX-sprite.centerX ),
-		align( bottomY+sprites.gingerman.centerY-sprite.height ) );
+		align( bottomY+(scaleFactor*9)-sprite.height ) );
 }
 
 function drawTree()
