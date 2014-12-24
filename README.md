@@ -4,6 +4,8 @@ Gingerman
 A christmas game for [Ludum Dare](http://ludumdare.com) #31.
 Theme was __Entire Game on One Screen__.
 
+![Screenshot](http://markusfisch.github.io/Gingerman/screenshot.png)
+
 Should work on any device with a modern web browser.
 
 View original
