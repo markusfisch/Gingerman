@@ -1,7 +1,15 @@
 Gingerman
 =========
 
-A game for [Ludum Dare](http://ludumdare.com) #31.
-Works on any device with a modern web browser.
+A christmas game for [Ludum Dare](http://ludumdare.com) #31.
+Theme was __Entire Game on One Screen__.
 
-[Play it](http://hhsw.de/sites/proto/ld31)!
+Should work on any device with a modern web browser.
+
+View original
+[submission](http://ludumdare.com/compo/ludum-dare-31/?action=preview&uid=19466).
+
+Play it
+-------
+
+Bring the [Gingerman](http://hhsw.de/sites/gingerman) the top of the tree!
