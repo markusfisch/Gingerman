@@ -14,4 +14,4 @@ View original
 Play it
 -------
 
-Bring the [Gingerman](http://hhsw.de/sites/gingerman) the top of the tree!
+Move the [Gingerman](http://hhsw.de/sites/gingerman) the top of the tree!
