@@ -25,9 +25,48 @@ canvas
 	left: 0; top: 0;
 }
 
+@-webkit-keyframes loading
+{
+	0% { -webkit-transform: translate( -50%, -50% ) scale( 1 ); }
+	50% { -webkit-transform: translate( -50%, -50% ) scale( 2 ); }
+	100% { -webkit-transform: translate( -50%, -50% ) scale( 1 ); }
+}
+@-moz-keyframes loading
+{
+	0% { -moz-transform: translate( -50%, -50% ) scale( 1 ); }
+	50% { -moz-transform: translate( -50%, -50% ) scale( 2 ); }
+	100% { -moz-transform: translate( -50%, -50% ) scale( 1 ); }
+}
+@-o-keyframes loading
+{
+	0% { -o-transform: translate( -50%, -50% ) scale( 1 ); }
+	50% { -o-transform: translate( -50%, -50% ) scale( 2 ); }
+	100% { -o-transform: translate( -50%, -50% ) scale( 1 ); }
+}
+@keyframes loading
+{
+	0% { transform: translate( -50%, -50% ) scale( 1 ); }
+	50% { transform: translate( -50%, -50% ) scale( 2 ); }
+	100% { transform: translate( -50%, -50% ) scale( 1 ); }
+}
+
+.Loading:after
+{
+	content: '';
+	position: fixed;
+	left: 50%; top: 50%;
+	width: 1em;
+	height: 1em;
+	background: #753612;
+	-webkit-animation: loading 1s linear infinite;
+	-moz-animation: loading 1s linear infinite;
+	-o-animation: loading 1s linear infinite;
+	animation: loading 1s linear infinite;
+}
+
 </style>
 </head>
-<body>
+<body class="Loading">
 <script>
 
 "use strict";
@@ -1564,6 +1603,11 @@ function init()
 		return;
 	}
 
+	var d = document;
+
+	// remove loading animation
+	d.body.className = "";
+
 	unpackAtlas();
 	createFragments();
 	createSparkles();
@@ -1571,8 +1615,6 @@ function init()
 
 	resize();
 	window.onresize = scheduleResize;
-
-	var d = document;
 
 	d.body.appendChild( bg );
 	d.body.appendChild( fg );
