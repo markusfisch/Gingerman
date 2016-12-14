@@ -1088,8 +1088,8 @@ function drawTree()
 	{
 		var p = y-t
 
-		for( var w = p*innerFactor, ix = x-w/2, innerMax = ix+w;//DBG
-			ix < innerMax;//DBG
+		for( var w = p*innerFactor, ix = x-w/2, innerMax = ix+w;
+			ix < innerMax;
 			ix += innerStep )
 		{
 			var branch = branches[(random()*p*branchFactor) | 0],
@@ -1158,8 +1158,8 @@ function drawRoom()
 		jumpTriggerY-touch.centerY )
 	ctxBg.globalAlpha = 1
 
-	for( var x = 0, y = height-floor.height;//DBG
-		x < width;//DBG
+	for( var x = 0, y = height-floor.height;
+		x < width;
 		x += w )
 		ctxBg.drawImage( floor, x, y )
 }
@@ -1417,15 +1417,15 @@ function scaleSprite( res, rect, w, h )
 		xs = (scaleFactor*rect.w+xf) | 0
 	}
 
-	for( var ay = rect.h, sy = 0;//DBG
-		ay--;//DBG
+	for( var ay = rect.h, sy = 0;
+		ay--;
 		offset += skip, sy += scaleFactor )
 	{
 		var y = Math.ceil( sy ),
 			h = Math.ceil( sy+scaleFactor )-y
 
-		for( var ax = rect.w, sx = xs;//DBG
-			ax--;//DBG
+		for( var ax = rect.w, sx = xs;
+			ax--;
 			sx += xf )
 		{
 			var r = atlas[offset++],
